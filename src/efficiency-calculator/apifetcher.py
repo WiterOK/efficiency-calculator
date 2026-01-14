@@ -1,7 +1,5 @@
 import requests
-from timestamps import GenerateUnixTimestamps
 from timestamps import NormalizeYear
-from tqdm import tqdm
 
 # for caching
 import json
@@ -26,23 +24,22 @@ def save_to_cache(lat, lon, year, data):
         json.dump(data, f)
 # end caching
 
-def GetMeteodata(lat, lon, year, api_key):
-    daily_timestamps = GenerateUnixTimestamps(year)
+def GetMeteodata(lat, lon, dt, api_key):
     hourly_data = []
 
-    for dt in tqdm(daily_timestamps, desc="Fetching historical weather", unit="day"):
-        url = BuildUrl(lat, lon, dt, api_key)
-        response = requests.get(url)
-        response.raise_for_status()
+    url = BuildUrl(lat, lon, dt, api_key)
+    response = requests.get(url)
+    response.raise_for_status()
 
-        data = response.json()
+    data = response.json()
 
-        for hour in data.get("hourly", []):
-            hourly_data.append({
-                "ts": hour["dt"],
-                "wind_speed": hour["wind_speed"],
-                "wind_gust": hour.get("wind_gust")
-            })
+    # ВИПРАВЛЕННЯ: timemachine API повертає "data", а не "hourly"
+    for hour in data.get("data", []):
+        hourly_data.append({
+            "ts": hour["dt"],
+            "wind_speed": hour["wind_speed"],
+            "wind_gust": hour.get("wind_gust")
+        })
 
     return hourly_data
 

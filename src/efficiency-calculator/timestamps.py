@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-# segments a 24-hour day into UNIX timestamps
+# generates UNIX timestamps for each day of the year
 def GenerateUnixTimestamps(year):
     start = datetime(year, 1, 1, tzinfo=timezone.utc)
     end = datetime(year + 1, 1, 1, tzinfo=timezone.utc)
@@ -29,5 +29,3 @@ def NormalizeYear(hourly_data, year):
 
     return hourly_data[:8760]
 
-
-# GenerateUnixTimestamps(2020)

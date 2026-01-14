@@ -1,16 +1,18 @@
 from apifetcher import load_from_cache, save_to_cache, GetMeteodata
 from timestamps import NormalizeYear, GenerateUnixTimestamps
+import config
 
 LAT = 48.45
 LON = 35.02
-YEAR = 2022
-API_KEY = "YOUR_API_KEY"
+# hardcoded for now, needs to be in config.py later
+YEAR = 2023
+API_KEY = config.OpenWeatherAPIKey()
 
-# 1️⃣ Try cache
+# Try cache first
 hourly_data = load_from_cache(LAT, LON, YEAR)
 
 if hourly_data is None:
-    print("Cache miss → fetching from OpenWeather")
+    print("No cache for those properties; fetching from OpenWeather")
 
     hourly_data = []
     daily_timestamps = GenerateUnixTimestamps(YEAR)
@@ -25,5 +27,6 @@ if hourly_data is None:
 
 else:
     print("Loaded from cache")
+    print(hourly_data)
 
-print(len(hourly_data))  # always 8760
+print(len(hourly_data))  # needs to be 8760
