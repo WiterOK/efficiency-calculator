@@ -6,26 +6,36 @@ The goal is to combine weather data with basic wind-energy physics to evaluate h
 
 ---
 
-## Current state
+## Functionality and TODO
 
-This project is in an early development stage.
+- [x] Base project structure
+- [x] Separate API keys
+- [x] Fetching meteorological data from OpenWeather API
+- [x] Local data caching
+- [x] Separate configuration file
 
-At the moment, it:
-- Fetches hourly meteorological data from **OpenWeather One Call API 3.0**
-- Parses wind and atmospheric parameters needed for further modeling
-
-No energy or efficiency calculations are implemented yet.
+- [ ] Define the data calculation process in kWh
+- [ ] Express the calculation process as a single formula
+- [ ] Implement the calculation process as a function (separate package)
+- [ ] Build a basic UI
+- [ ] Move all constants to `config.py`
+- [ ] Research proper cache handling strategies
+- [ ] Refactor UI to production-ready quality
+- [ ] Expose logic via API / integrate based on team requirements
+- [ ] Implement full report generation (PDF)
+- [ ] Research instant payment methods for the website
+- [ ] Make full report generation a paid feature
 
 ---
 
 ## Planned functionality
 
 The project is intended to:
-- Convert wind data and turbine properties to estimated returns in value of the turbine at given points
+- Convert wind data and turbine properties to estimated turbine value at given locations
 - Compute air density from temperature and pressure
 - Estimate wind power and turbine output
 - Calculate energy production over time
-- Evaluate site efficiency / capacity factor if WiterOK turbines
+- Evaluate site efficiency / capacity factor for WiterOK turbines
 
 ---
 
