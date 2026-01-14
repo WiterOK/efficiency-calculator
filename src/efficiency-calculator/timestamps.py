@@ -29,5 +29,3 @@ def NormalizeYear(hourly_data, year):
 
     return hourly_data[:8760]
 
-
-# GenerateUnixTimestamps(2020)
