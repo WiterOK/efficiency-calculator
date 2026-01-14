@@ -1,6 +1,7 @@
 from apifetcher import load_from_cache, save_to_cache, GetMeteodata
 from timestamps import NormalizeYear, GenerateUnixTimestamps
 
+
 LAT = 48.45
 LON = 35.02
 YEAR = 2022
