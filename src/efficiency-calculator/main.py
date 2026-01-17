@@ -1,11 +1,12 @@
 from apifetcher import load_from_cache, save_to_cache, GetMeteodata
 from timestamps import NormalizeYear, GenerateUnixTimestamps
+from kwh_calculator import calculate_year_energy
 import config
 
-LAT = 48.45
-LON = 35.02
-# hardcoded for now, needs to be in config.py later
-YEAR = 2023
+LAT = config.LAT
+LON = config.LON
+YEAR = config.YEAR
+R = config.R
 API_KEY = config.OpenWeatherAPIKey()
 
 # Try cache first
@@ -27,6 +28,8 @@ if hourly_data is None:
 
 else:
     print("Loaded from cache")
-    print(hourly_data)
 
-print(len(hourly_data))  # needs to be 8760
+year_energy = calculate_year_energy(hourly_data, R)
+
+print(len(hourly_data))
+print(year_energy)  # needs to be 8760
