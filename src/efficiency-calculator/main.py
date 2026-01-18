@@ -27,6 +27,7 @@ if hourly_data is None:
 
 else:
     print("Loaded from cache")
-    print(hourly_data)
+    print("Data for this entry can be found at", config.CachePath())
+    # print(hourly_data)
 
 print(len(hourly_data))  # needs to be 8760
