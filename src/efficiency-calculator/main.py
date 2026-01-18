@@ -28,6 +28,8 @@ if hourly_data is None:
 
 else:
     print("Loaded from cache")
+    print("Data for this entry can be found at", config.CachePath())
+    # print(hourly_data)
 
 year_energy = calculate_year_energy(hourly_data, R)
 
