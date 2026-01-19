@@ -35,4 +35,4 @@ else:
 year_energy = calculate_year_energy(hourly_data, R)
 
 print(len(hourly_data))
-print(year_energy)  # needs to be 8760
+print(year_energy)
