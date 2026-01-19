@@ -1,3 +1,4 @@
+from tqdm import tqdm
 from apifetcher import load_from_cache, save_to_cache, GetMeteodata
 from timestamps import NormalizeYear, GenerateUnixTimestamps
 from kwh_calculator import calculate_year_energy
@@ -18,9 +19,9 @@ if hourly_data is None:
     hourly_data = []
     daily_timestamps = GenerateUnixTimestamps(YEAR)
 
-    for dt in daily_timestamps:
+    for dt in tqdm(daily_timestamps, desc="Fetching OpenWeather data"):
         day_hours = GetMeteodata(LAT, LON, dt, API_KEY)
-        hourly_data.extend(day_hours)
+        hourly_data.extend(day_hours)  
 
     hourly_data = NormalizeYear(hourly_data, YEAR)
 

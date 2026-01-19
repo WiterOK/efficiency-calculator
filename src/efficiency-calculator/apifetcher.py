@@ -1,11 +1,12 @@
 import requests
 from timestamps import NormalizeYear
+import config
 
 # for caching
 import json
 from pathlib import Path
 
-CACHE_DIR = Path("cache/openweather")
+CACHE_DIR = config.CachePath()
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 def _cache_path(lat, lon, year):
