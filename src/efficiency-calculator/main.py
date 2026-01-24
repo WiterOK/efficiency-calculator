@@ -1,38 +1,31 @@
-from tqdm import tqdm
-from apifetcher import load_from_cache, save_to_cache, GetMeteodata
-from timestamps import NormalizeYear, GenerateUnixTimestamps
-from kwh_calculator import calculate_year_energy
 import config
+from services import WeatherService
+from physics import WindPhysics
 
-LAT = config.LAT
-LON = config.LON
-YEAR = config.YEAR
-R = config.R
-API_KEY = config.OpenWeatherAPIKey()
+def main():
+    weather_svc = WeatherService(config.LAT, config.LON, config.OpenWeatherAPIKey())
+    physics = WindPhysics(config.ALPHA)
+    
+    asl = weather_svc.get_elevation()
+    weather_data = weather_svc.get_yearly_weather(config.YEAR)
+    
+    # WITeRoK or STANDARD_HAWT
+    turbine = config.STANDARD_HAWT
+    total_kwh = sum(physics.calculate_day_energy(d["wind_speed"], asl, turbine) for d in weather_data)
+    
+    print(f"\n--- {turbine.name} Annual Report ---")
+    print(f"Energy Production: {total_kwh:,.2f} kWh")
+    print(f"Average Power: {(total_kwh/8760)*1000:.2f} Watts")
+    
+    speeds = [d["wind_speed"] for d in weather_data]
+    
+    print("-" * 30)
+    if speeds:
+        print(f"Min/Max wind speed: {min(speeds)} {max(speeds)}")
+        print(f"Average wind speed: {sum(speeds)/len(speeds)}")
+    
+    print(f"Height: {asl} m")
+    print(f"Days: {len(weather_data)}")
 
-# Try cache first
-hourly_data = load_from_cache(LAT, LON, YEAR)
-
-if hourly_data is None:
-    print("No cache for those properties; fetching from OpenWeather")
-
-    hourly_data = []
-    daily_timestamps = GenerateUnixTimestamps(YEAR)
-
-    for dt in tqdm(daily_timestamps, desc="Fetching OpenWeather data"):
-        day_hours = GetMeteodata(LAT, LON, dt, API_KEY)
-        hourly_data.extend(day_hours)  
-
-    hourly_data = NormalizeYear(hourly_data, YEAR)
-
-    save_to_cache(LAT, LON, YEAR, hourly_data)
-
-else:
-    print("Loaded from cache")
-    print("Data for this entry can be found at", config.CachePath())
-    # print(hourly_data)
-
-year_energy = calculate_year_energy(hourly_data, R)
-
-print(len(hourly_data))
-print(year_energy)
+if __name__ == "__main__":
+    main()
