@@ -13,18 +13,22 @@ def OpenWeatherAPIKey():
 def CachePath():
     return Path(__file__).resolve().parent / "cache" / "openweather"
 
+# WAVT - Vertical Axis Wind Turbine
+# vales in meters
 WITEROK = WindTurbine(
     name="WITeRoK",
     type=TurbineType.VAWT,
     height=2.5,
-    width=1.0,
+    width=0.2,
+    radius=0.325,
     hub_height=2.5,
     cp=0.3,
-    nominal_speed=15.0,
-    cut_in=2.0,
+    nominal_speed=10.0,
+    cut_in=5.0,
     cut_out=25.0
 )
 
+# HAWT - Horizontal Axis Wind Turbine
 STANDARD_HAWT = WindTurbine(
     name="Industrial HAWT",
     type=TurbineType.HAWT,
