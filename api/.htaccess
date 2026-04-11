@@ -1,0 +1,9 @@
+# Route all requests that don't map to a real file/directory to index.php
+# so that the URL /api/calculate works regardless of how the directory is served.
+
+Options -Indexes
+
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
