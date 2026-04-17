@@ -59,3 +59,4 @@ The project is intended to:
 3. Install all dependencies and run the main script with:
     ```bash
     python main.py
+Railway deploy
