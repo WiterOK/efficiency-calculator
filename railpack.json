@@ -1,0 +1,8 @@
+{
+  "$schema": "https://schema.railpack.com",
+  "provider": "php",
+  "deploy": {
+    "aptPackages": ["python3", "python3-requests"],
+    "startCommand": "php -S 0.0.0.0:${PORT:-8080} -t api api/index.php"
+  }
+}
