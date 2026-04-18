@@ -3,12 +3,24 @@
  * API configuration.
  *
  * Set environment variables to override defaults:
- *   FRONTEND_ORIGIN  — full origin of the WordPress site, e.g. https://example.com
+ *   FRONTEND_ORIGIN  — full origin of the WordPress site, e.g. https://example.com (legacy single-origin)
+ *   FRONTEND_ORIGINS — comma-separated list of allowed origins, e.g. https://example.com,http://localhost:5173
  *   API_KEY          — shared secret clients send in X-Api-Key header; leave empty to disable
  *   PYTHON_BIN       — path to the Python 3 interpreter (default: python3)
  *   OPENWEATHER_API_KEY — forwarded to the Python script as an env var
  */
 declare(strict_types=1);
+
+$originsEnv = (string)(getenv('FRONTEND_ORIGINS') ?: '');
+$origins = [];
+if ($originsEnv !== '') {
+    $origins = array_map('trim', explode(',', $originsEnv));
+} else {
+    $single = (string)(getenv('FRONTEND_ORIGIN') ?: '');
+    if ($single !== '') {
+        $origins = [$single];
+    }
+}
 
 return [
 
@@ -18,7 +30,7 @@ return [
     // List every origin that is allowed to call this API.
     // Requests from unlisted origins will not receive CORS credentials.
     'allowed_origins' => array_filter([
-        getenv('FRONTEND_ORIGIN') ?: 'https://example.com',
+        ...($origins !== [] ? $origins : ['https://example.com']),
     ]),
 
     // -----------------------------------------------------------------

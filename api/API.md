@@ -15,12 +15,14 @@ POST /api/calculate
 ## Request
 
 **Headers:**
+
 ```
 Content-Type: application/json
 X-Api-Key: <key>          ← only required if API_KEY env var is set on the server
 ```
 
 **Body:**
+
 ```json
 {
   "value1":  46.8483,       ← latitude  (required, -90 … 90)
@@ -35,31 +37,34 @@ X-Api-Key: <key>          ← only required if API_KEY env var is set on the ser
 ## Response
 
 **Success `200`:**
+
 ```json
 { "result": 17431012.99 }
 ```
+
 `result` is the estimated annual energy production in **kWh**.
 
 **Errors:**
 
-| Code | Meaning |
-|------|---------|
+| Code  | Meaning                                                                |
+| ----- | ---------------------------------------------------------------------- |
 | `400` | Invalid or missing input — `{ "error": "..." }` describes what's wrong |
-| `401` | Missing or wrong `X-Api-Key` header |
-| `429` | Rate limit hit (60 req/min per IP) — check `Retry-After` header |
-| `500` | Calculation failed — `{ "error": "..." }` has details |
+| `401` | Missing or wrong `X-Api-Key` header                                    |
+| `429` | Rate limit hit (60 req/min per IP) — check `Retry-After` header        |
+| `500` | Calculation failed — `{ "error": "..." }` has details                  |
 
 ---
 
 ## Usage examples
 
 **JS (fetch):**
+
 ```js
-const res = await fetch('https://your-api-domain.com/api/calculate', {
-  method: 'POST',
+const res = await fetch("https://your-api-domain.com/api/calculate", {
+  method: "POST",
   headers: {
-    'Content-Type': 'application/json',
-    'X-Api-Key': 'your-key',   // omit if no key is configured
+    "Content-Type": "application/json",
+    "X-Api-Key": "your-key", // omit if no key is configured
   },
   body: JSON.stringify({ value1: 46.8483, value2: 31.0821 }),
 });
@@ -67,6 +72,7 @@ const { result } = await res.json();
 ```
 
 **PHP (backend → API):**
+
 ```php
 $response = wp_remote_post('https://your-api-domain.com/api/calculate', [
   'headers' => ['Content-Type' => 'application/json', 'X-Api-Key' => 'your-key'],
@@ -77,6 +83,7 @@ $data = json_decode(wp_remote_retrieve_body($response), true);
 ```
 
 **curl (quick test):**
+
 ```bash
 curl -X POST https://your-api-domain.com/api/calculate \
   -H "Content-Type: application/json" \
@@ -89,12 +96,13 @@ curl -X POST https://your-api-domain.com/api/calculate \
 
 Set these on the server before running:
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `OPENWEATHER_API_KEY` | Yes | OpenWeather One Call 3.0 key |
-| `FRONTEND_ORIGIN` | Yes | Full origin of the WordPress site, e.g. `https://example.com` |
-| `API_KEY` | No | Shared secret for `X-Api-Key` header protection. Leave unset to disable. |
-| `PYTHON_BIN` | No | Path to Python 3 interpreter. Defaults to `python3`. Point to a venv if needed. |
+| Variable              | Required | Description                                                                                     |
+| --------------------- | -------- | ----------------------------------------------------------------------------------------------- |
+| `OPENWEATHER_API_KEY` | Yes      | OpenWeather One Call 3.0 key                                                                    |
+| `FRONTEND_ORIGINS`    | Yes      | Comma-separated list of allowed origins, e.g. `https://witerok.com,http://localhost:5173`       |
+| `FRONTEND_ORIGIN`     | No       | Legacy single allowed origin, e.g. `https://example.com` (ignored if `FRONTEND_ORIGINS` is set) |
+| `API_KEY`             | No       | Shared secret for `X-Api-Key` header protection. Leave unset to disable.                        |
+| `PYTHON_BIN`          | No       | Path to Python 3 interpreter. Defaults to `python3`. Point to a venv if needed.                 |
 
 ---
 
@@ -106,7 +114,7 @@ Pre-warm the cache for known locations if cold-start latency is a concern.
 
 ---
 
-## ⚠ Server setup — *caution: not sure if this is needed, providing just in case*
+## ⚠ Server setup — _caution: not sure if this is needed, providing just in case_
 
 If the API lives on the **same server as WordPress** under a subdirectory (e.g. `/api/`), you may need to add this to the **root** `.htaccess` so WordPress doesn't intercept the route before it reaches the API:
 
