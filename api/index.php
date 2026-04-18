@@ -56,15 +56,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $method = $_SERVER['REQUEST_METHOD'];
 $path   = '/' . trim((string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH), '/');
 
-if ($method !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed']);
+// Health check / landing response (so opening the Railway domain in a browser works).
+if ($method === 'GET' && $path === '/') {
+    echo json_encode(['ok' => true]);
     exit;
 }
 
 if ($path !== '/api/calculate') {
     http_response_code(404);
     echo json_encode(['error' => 'Not found']);
+    exit;
+}
+
+if ($method !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['error' => 'Method not allowed']);
     exit;
 }
 
