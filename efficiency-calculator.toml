@@ -2,7 +2,7 @@
 name = "efficiency-calculator"
 version = "0.0.1"
 description = "A windmill efficiency calculator for the WiterOK website"
-readme = "README.md"
+readme = "readme.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
 
@@ -12,7 +12,6 @@ authors = [
 
 dependencies = [
   "requests>=2.31",
-  "os>=1.0",
 ]
 
 [project.optional-dependencies]
