@@ -58,7 +58,10 @@ $path   = '/' . trim((string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_P
 
 // Health check / landing response (so opening the Railway domain in a browser works).
 if ($method === 'GET' && $path === '/') {
-    echo json_encode(['ok' => true]);
+    echo json_encode([
+        'ok' => true,
+        'has_openweather_api_key' => ((string)(getenv('OPENWEATHER_API_KEY') ?: '')) !== '',
+    ]);
     exit;
 }
 
@@ -203,6 +206,12 @@ if (array_key_exists('turbine', $data)) {
 // Run calculation
 // -------------------------------------------------------------------------
 try {
+    $openWeatherKey = (string)(getenv('OPENWEATHER_API_KEY') ?: '');
+    if ($openWeatherKey === '') {
+        http_response_code(500);
+        echo json_encode(['error' => 'Server misconfigured: missing OPENWEATHER_API_KEY']);
+        exit;
+    }
     $result = runPython($lat, $lon, $year, $turbine, $config['python']);
     echo json_encode(['result' => $result]);
 } catch (RuntimeException $e) {

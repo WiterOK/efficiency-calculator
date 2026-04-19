@@ -45,6 +45,11 @@ def main() -> None:
         turbine  = TURBINES[args.turbine]
         api_key  = cfg.OpenWeatherAPIKey()
 
+        if not api_key:
+            raise RuntimeError(
+                "Missing OPENWEATHER_API_KEY (server env var)."
+            )
+
         service  = WeatherService(args.lat, args.lon, api_key)
         physics  = WindPhysics(cfg.ALPHA)
 
