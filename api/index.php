@@ -60,7 +60,8 @@ $path   = '/' . trim((string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_P
 if ($method === 'GET' && $path === '/') {
     echo json_encode([
         'ok' => true,
-        'has_openweather_api_key' => ((string)(getenv('OPENWEATHER_API_KEY') ?: '')) !== '',
+        'has_openweather_api_key' => envValue('OPENWEATHER_API_KEY') !== '',
+        'openweather_api_key_sources' => envPresence('OPENWEATHER_API_KEY'),
     ]);
     exit;
 }
@@ -206,7 +207,7 @@ if (array_key_exists('turbine', $data)) {
 // Run calculation
 // -------------------------------------------------------------------------
 try {
-    $openWeatherKey = (string)(getenv('OPENWEATHER_API_KEY') ?: '');
+    $openWeatherKey = envValue('OPENWEATHER_API_KEY');
     if ($openWeatherKey === '') {
         http_response_code(500);
         echo json_encode(['error' => 'Server misconfigured: missing OPENWEATHER_API_KEY']);
@@ -249,7 +250,7 @@ function runPython(float $lat, float $lon, int $year, string $turbine, array $cf
 
     // Pass the OpenWeather API key through the environment.
     $env = array_merge($_ENV, [
-        'OPENWEATHER_API_KEY' => (string)(getenv('OPENWEATHER_API_KEY') ?: ''),
+        'OPENWEATHER_API_KEY' => envValue('OPENWEATHER_API_KEY'),
     ]);
 
     $process = proc_open($cmd, $descriptors, $pipes, $cfg['working_dir'], $env);
@@ -316,4 +317,47 @@ function runPython(float $lat, float $lon, int $year, string $turbine, array $cf
     }
 
     return (float) $decoded['result'];
+}
+
+/**
+ * Returns the env var value without leaking secrets via var_dump.
+ * Some platforms expose runtime variables in $_ENV or $_SERVER even
+ * when getenv() returns empty.
+ */
+function envValue(string $key): string
+{
+    $value = getenv($key);
+    if (is_string($value) && $value !== '') {
+        return $value;
+    }
+
+    $envValue = $_ENV[$key] ?? null;
+    if (is_string($envValue) && $envValue !== '') {
+        return $envValue;
+    }
+
+    $serverValue = $_SERVER[$key] ?? null;
+    if (is_string($serverValue) && $serverValue !== '') {
+        return $serverValue;
+    }
+
+    return '';
+}
+
+/**
+ * Debug helper for the health endpoint: indicates where the key is present.
+ */
+function envPresence(string $key): array
+{
+    $getenvValue = getenv($key);
+    $fromGetenv = is_string($getenvValue) && $getenvValue !== '';
+
+    $fromEnv = isset($_ENV[$key]) && is_string($_ENV[$key]) && $_ENV[$key] !== '';
+    $fromServer = isset($_SERVER[$key]) && is_string($_SERVER[$key]) && $_SERVER[$key] !== '';
+
+    return [
+        'getenv' => $fromGetenv,
+        '_ENV' => $fromEnv,
+        '_SERVER' => $fromServer,
+    ];
 }

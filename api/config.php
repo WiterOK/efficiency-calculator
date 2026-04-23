@@ -11,12 +11,28 @@
  */
 declare(strict_types=1);
 
-$originsEnv = (string)(getenv('FRONTEND_ORIGINS') ?: '');
+$env = static function (string $key): string {
+    $value = getenv($key);
+    if (is_string($value) && $value !== '') {
+        return $value;
+    }
+    $envValue = $_ENV[$key] ?? null;
+    if (is_string($envValue) && $envValue !== '') {
+        return $envValue;
+    }
+    $serverValue = $_SERVER[$key] ?? null;
+    if (is_string($serverValue) && $serverValue !== '') {
+        return $serverValue;
+    }
+    return '';
+};
+
+$originsEnv = $env('FRONTEND_ORIGINS');
 $origins = [];
 if ($originsEnv !== '') {
     $origins = array_map('trim', explode(',', $originsEnv));
 } else {
-    $single = (string)(getenv('FRONTEND_ORIGIN') ?: '');
+    $single = $env('FRONTEND_ORIGIN');
     if ($single !== '') {
         $origins = [$single];
     }
@@ -38,7 +54,7 @@ return [
     // -----------------------------------------------------------------
     // If non-empty, every request must include the matching value in the
     // X-Api-Key header.  Set to '' to disable.
-    'api_key' => (string)(getenv('API_KEY') ?: ''),
+    'api_key' => $env('API_KEY'),
 
     // -----------------------------------------------------------------
     // Rate limiting  (file-based, per-IP, per-minute)
@@ -54,7 +70,7 @@ return [
     // Python subprocess
     // -----------------------------------------------------------------
     'python' => [
-        'executable'  => (string)(getenv('PYTHON_BIN') ?: 'python3'),
+        'executable'  => ($env('PYTHON_BIN') !== '' ? $env('PYTHON_BIN') : 'python3'),
         'script'      => dirname(__DIR__) . '/src/efficiency-calculator/cli.py',
         // cwd must be the package directory so relative imports resolve.
         'working_dir' => dirname(__DIR__) . '/src/efficiency-calculator',
