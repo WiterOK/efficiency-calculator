@@ -1,4 +1,6 @@
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from timestamps import NormalizeYear
 import config
 
@@ -8,6 +10,22 @@ from pathlib import Path
 
 CACHE_DIR = config.CachePath()
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+# Reuse connections + retry transient failures to avoid hanging the PHP request.
+_RETRY = Retry(
+    total=3,
+    connect=3,
+    read=3,
+    status=3,
+    backoff_factor=0.5,
+    status_forcelist=(429, 500, 502, 503, 504),
+    allowed_methods=("GET",),
+    raise_on_status=False,
+)
+
+_SESSION = requests.Session()
+_SESSION.mount("https://", HTTPAdapter(max_retries=_RETRY))
+_SESSION.mount("http://", HTTPAdapter(max_retries=_RETRY))
 
 def _cache_path(lat, lon, year):
     return CACHE_DIR / f"{lat:.4f}_{lon:.4f}_{year}.json"
@@ -29,8 +47,12 @@ def GetMeteodata(lat, lon, dt, api_key):
     hourly_data = []
 
     url = BuildUrl(lat, lon, dt, api_key)
-    response = requests.get(url)
-    response.raise_for_status()
+    response = _SESSION.get(url, timeout=10)
+    # If we got a non-2xx response, surface a helpful error.
+    if not response.ok:
+        raise RuntimeError(
+            f"OpenWeather request failed ({response.status_code}): {response.text[:200]}"
+        )
 
     data = response.json()
 

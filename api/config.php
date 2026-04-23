@@ -7,6 +7,7 @@
  *   FRONTEND_ORIGINS — comma-separated list of allowed origins, e.g. https://example.com,http://localhost:5173
  *   API_KEY          — shared secret clients send in X-Api-Key header; leave empty to disable
  *   PYTHON_BIN       — path to the Python 3 interpreter (default: python3)
+ *   PYTHON_TIMEOUT   — hard timeout (seconds) for the Python subprocess (default: 90)
  *   OPENWEATHER_API_KEY — forwarded to the Python script as an env var
  */
 declare(strict_types=1);
@@ -76,6 +77,13 @@ return [
         'working_dir' => dirname(__DIR__) . '/src/efficiency-calculator',
         // Hard timeout in seconds.  Cached runs finish in <1 s;
         // uncached runs fetch 365 API days and may take 30–60 s.
-        'timeout'     => 30,
+        'timeout'     => (function () use ($env): int {
+            $raw = $env('PYTHON_TIMEOUT');
+            if ($raw === '') {
+                return 90;
+            }
+            $value = (int) $raw;
+            return $value > 0 ? $value : 90;
+        })(),
     ],
 ];

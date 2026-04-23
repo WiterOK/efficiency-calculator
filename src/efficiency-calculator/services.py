@@ -1,3 +1,5 @@
+import sys
+
 from tqdm import tqdm
 import apifetcher
 import height
@@ -17,7 +19,8 @@ class WeatherService:
         if data: return data
 
         data = []
-        for dt in tqdm(GenerateUnixTimestamps(year), desc="API Data"):
+        disable_progress = not sys.stderr.isatty()
+        for dt in tqdm(GenerateUnixTimestamps(year), desc="API Data", disable=disable_progress):
             data.extend(apifetcher.GetMeteodata(self.lat, self.lon, dt, self.api_key))
         
         data = NormalizeYear(data, year)
