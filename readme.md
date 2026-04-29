@@ -14,14 +14,14 @@ The goal is to combine weather data with basic wind-energy physics to evaluate h
 - [x] Local data caching
 - [x] Separate configuration file
 
-- [ ] Define the data calculation process in kWh
-- [ ] Express the calculation process as a single formula
-- [ ] Implement the calculation process as a function (separate package)
-- [ ] Build a basic UI
-- [ ] Move all constants to `config.py`
+- [x] Define the data calculation process in kWh
+- [x] Express the calculation process as a single formula
+- [x] Implement the calculation process as a function (separate package)
+- [x] Build a basic UI (via vite frontend)
+- [x] Move all constants to `config.py`
 - [ ] Research proper cache handling strategies
 - [ ] Refactor UI to production-ready quality
-- [ ] Expose logic via API / integrate based on team requirements
+- [x] Expose logic via API / integrate based on team requirements
 - [ ] Implement full report generation (PDF)
 - [ ] Research instant payment methods for the website
 - [ ] Make full report generation a paid feature
